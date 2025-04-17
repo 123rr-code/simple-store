@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Cart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      padding: 30px;
+      margin: 0;
+      background: linear-gradient(to right, #f9f9f9, #e0f7fa);
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 36px;
+      color: #2c3e50;
+    }
+
+    .products {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .product {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      width: 240px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .product:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .product h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      color: #00796b;
+    }
+
+    .product p {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+
+    .product button {
+      background-color: #26a69a;
+      border: none;
+      color: #fff;
+      padding: 10px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background-color 0.2s;
+    }
+
+    .product button:hover {
+      background-color: #00897b;
+    }
+
+    #cart {
+      margin-top: 60px;
+      background: #ffffff;
+      border-top: 4px solid #26a69a;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #cart h2 {
+      margin-top: 0;
+      color: #00695c;
+    }
+
+    #cart-items {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    #cart-items li {
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    #cart-items button {
+      margin-left: 5px;
+      padding: 4px 8px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    #cart-items button:nth-child(2) {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    #cart-items button:nth-child(2):hover {
+      background-color: #0056b3;
+    }
+
+    #cart-items button:nth-child(3) {
+      background-color: #ffc107;
+      color: #fff;
+    }
+
+    #cart-items button:nth-child(3):hover {
+      background-color: #e0a800;
+    }
+
+    #cart-items button:nth-child(4) {
+      background-color: #dc3545;
+      color: #fff;
+    }
+
+    #cart-items button:nth-child(4):hover {
+      background-color: #c82333;
+    }
+
+    #cart p {
+      font-weight: 600;
+      font-size: 20px;
+      margin-top: 20px;
+    }
+
+    #cart button {
+      background-color: #00796b;
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: background-color 0.3s ease;
+    }
+
+    #cart button:hover {
+      background-color: #004d40;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Simple Store</h1>
+
+  <div class="products">
+    <div class="product">
+      <h3>Product A</h3>
+      <p>Price: $10</p>
+      <button onclick="addToCart('Product A', 10)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <h3>Product B</h3>
+      <p>Price: $15</p>
+      <button onclick="addToCart('Product B', 15)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <h3>Product C</h3>
+      <p>Price: $20</p>
+      <button onclick="addToCart('Product C', 20)">Add to Cart</button>
+    </div>
+  </div>
+
+  <div id="cart">
+    <h2>Cart</h2>
+    <ul id="cart-items"></ul>
+    <p>Total: $<span id="total">0.00</span></p>
+    <button onclick="goToPayment()">Proceed to Payment</button>
+  </div>
+
+  <script>
+    let cart = [];
+
+    function addToCart(name, price) {
+      const item = cart.find(i => i.name === name);
+      if (item) {
+        item.quantity++;
+      } else {
+        cart.push({ name, price, quantity: 1 });
+      }
+      updateCart();
+    }
+
+    function removeFromCart(name) {
+      cart = cart.filter(i => i.name !== name);
+      updateCart();
+    }
+
+    function changeQuantity(name, delta) {
+      const item = cart.find(i => i.name === name);
+      if (item) {
+        item.quantity += delta;
+        if (item.quantity <= 0) {
+          removeFromCart(name);
+        }
+      }
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartItems = document.getElementById('cart-items');
+      const totalSpan = document.getElementById('total');
+      cartItems.innerHTML = '';
+      let total = 0;
+
+      cart.forEach(item => {
+        total += item.price * item.quantity;
+        cartItems.innerHTML += `
+          <li>
+            ${item.name} - $${item.price} x ${item.quantity}
+            <button onclick="changeQuantity('${item.name}', 1)">+</button>
+            <button onclick="changeQuantity('${item.name}', -1)">-</button>
+            <button onclick="removeFromCart('${item.name}')">Remove</button>
+          </li>
+        `;
+      });
+
+      totalSpan.textContent = total.toFixed(2);
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    function goToPayment() {
+      window.location.href = "payment.html";
+    }
+
+    window.onload = () => {
+      const storedCart = localStorage.getItem('cart');
+      if (storedCart) {
+        cart = JSON.parse(storedCart);
+        updateCart();
+      }
+    };
+  </script>
+</body>
+</html>
